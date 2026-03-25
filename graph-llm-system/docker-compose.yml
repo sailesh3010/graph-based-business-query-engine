@@ -18,13 +18,14 @@ services:
     restart: always
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
       - DB_HOST=db
       - DB_PORT=5432
       - DB_NAME=graph_system
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD:-Sailesh@12345}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - db
 
