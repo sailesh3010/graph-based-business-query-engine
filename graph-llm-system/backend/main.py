@@ -6,6 +6,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 
 from database import get_schema_info, get_table_counts
 from graph_builder import build_graph, graph_to_json, get_node_detail, get_neighbors
@@ -120,6 +123,24 @@ def api_schema():
 @app.get("/api/health")
 def api_health():
     return {"status": "ok", "message": "O2C Graph API is running"}
+
+
+# ─── Static Frontend ─────────────────────────────────────────
+
+# Serve the React app
+frontend_dist = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="static")
+
+    @app.exception_handler(404)
+    async def not_found_handler(request, exc):
+        # Return 404 for API routes, but return the React app for anything else
+        if request.url.path.startswith("/api/"):
+            return JSONResponse({"detail": "Not Found"}, status_code=404)
+        index_file = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
 
 
 if __name__ == "__main__":
