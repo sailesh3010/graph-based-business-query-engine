@@ -22,8 +22,14 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 # Copy backend source
 COPY backend/ ./backend/
 
+# Copy the raw dataset so ingest.py can populate the DB on first run
+COPY sap-o2c-data/ ./sap-o2c-data/
+
 # Copy built frontend from Stage 1 into expected location
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Make entrypoint script executable
+RUN chmod +x ./backend/entrypoint.sh
 
 # Expose the API port
 EXPOSE 8000
@@ -31,6 +37,7 @@ EXPOSE 8000
 # Prevent python from buffering stdout/stderr
 ENV PYTHONUNBUFFERED=1
 
-# Run the FastAPI server
+# Run the FastAPI server via entrypoint
 WORKDIR /app/backend
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
