@@ -110,6 +110,27 @@ npm run dev
 ### 4. Open the App
 Navigate to **http://localhost:5173**
 
+## 🐳 Deployment (Docker & Cloud)
+
+The system is fully containerized for 1-click deployments. The FastAPI backend is configured to statically serve the built React frontend, allowing the entire application to run as a single web service.
+
+### Local Docker Deployment
+If you have Docker installed, simply run:
+```bash
+docker-compose up --build
+```
+This will spin up a PostgreSQL database, automatically ingest the dataset, build the Vite frontend, and launch the unified FastAPI server on `http://localhost:8000`.
+
+### Cloud Deployment (Render.com)
+You can deploy this repository live to the internet for free using [Render](https://render.com):
+1. Connect your GitHub repository to Render.
+2. Create a **PostgreSQL** instance (Free Tier).
+3. Create a **Web Service** mapped to this repository.
+    - **Environment**: Docker
+    - **Environment Variables**:
+      - `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_HOST` (Matches the Postgres DB)
+      - `GEMINI_API_KEY` = `your-api-key`
+
 ## 💬 Example Queries
 
 - "Which products are associated with the highest number of billing documents?"
